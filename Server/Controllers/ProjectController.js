@@ -107,3 +107,76 @@ exports.getProjectById = async (req, res) => {
     }
 }
 
+// UPDATING THE PROJECT
+exports.updateProject = async (req, res) => {
+    try{
+        //FETCHING PROJECT ID FROM THE REQUEST PARAMETERS
+        const projectId = req.params.id;
+
+        //FETCHING DATA FROM THE REQUEST BODY
+        const update = req.body;
+
+        // VALIDATING THE PROJECT ID
+        if (!projectId) {
+            return res.status(400).json({
+                success: false,
+                message: "Project ID is required"
+            });
+        }
+
+        // UPDATING THE PROJECT IN THE DATABASE
+        const updatedProject = await Project.findByIdAndUpdate(projectId, update, { new: true , runValidators: true })
+            .populate('ProjectManager', 'name email')
+            .populate('teamMembers', 'name email')
+            .populate('task'); 
+
+        // SENDING SUCCESS RESPONSE 
+        if (!updatedProject) {
+            return res.status(404).json({
+                success: false,
+                message: "Project not found"
+            });
+        }
+
+    }catch(err){
+        console.error("Error in updateProject:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+}
+
+// DELETE PROJECT
+exports.deleteProject = async (req, res) => {
+    try{
+        // FETCHING PROJECT ID FROM THE REQUEST PARAMETERS
+        const projectId = req.params.id;
+
+        // VALIDATING THE PROJECT ID
+        if (!projectId) {   
+            return res.status(400).json({
+                success: false,
+                message: "Project ID is required"
+            });
+        }
+
+        // DELETING THE PROJECT FROM THE DATABASE
+        const deletedProject = await Project.findByIdAndDelete(projectId);
+
+        // SENDING SUCCESS RESPONSE  
+        return res.status(200).json({
+            success: true,
+            message: "Project deleted successfully"
+        });
+
+    }catch(err){
+        console.error("Error in deleteProject:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+}
