@@ -148,6 +148,45 @@ exports.updateProject = async (req, res) => {
     }
 }
 
+// SOFT DELETE PROJECT
+exports.softDeleteProject = async (req, res) => {
+    try{
+        // FETCHING PROJECT ID FROM THE REQUEST PARAMETERS
+        const projectId = req.params.id;
+
+        // VALIDATING THE PROJECT ID
+        if (!projectId) {
+            return res.status(400).json({
+                success: false,
+                message: "Project ID is required"
+            });
+        }
+
+        // SOFT DELETING THE PROJECT BY UPDATING THE IS_DELETED FIELD
+        const updatedProject = await Project.findByIdAndUpdate(
+            projectId,
+            { isDeleted: true },
+            { new: true, runValidators: true }
+        ).populate('ProjectManager', 'name email')
+         .populate('teamMembers', 'name email')
+         .populate('task');
+
+        // SENDING SUCCESS RESPONSE
+        return res.status(200).json({
+            success: true,
+            message: "Project soft deleted successfully",
+            project: updatedProject
+        });
+    }catch(err){
+        console.error("Error in softDeleteProject:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+}
+
 // DELETE PROJECT
 exports.deleteProject = async (req, res) => {
     try{
