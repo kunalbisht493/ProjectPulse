@@ -4,7 +4,7 @@ const Task = require('../Models/Task');
 
 // CREATE A NEW PROJECT
 exports.createProject = async (req, res) => {
-    try{
+    try {
         // FETCHING DATA FROM THE REQUEST BODY
         const { title, description, deadline, ProjectManager, teamMembers, task } = req.body;
 
@@ -30,7 +30,7 @@ exports.createProject = async (req, res) => {
             message: "Project created successfully",
             project: newProject
         })
-    }catch(err){
+    } catch (err) {
         console.error("Error in createProject:", err);
         return res.status(500).json({
             success: false,
@@ -42,7 +42,7 @@ exports.createProject = async (req, res) => {
 
 // GET ALL PROJECTS
 exports.getAllProjects = async (req, res) => {
-    try{
+    try {
         // FETCHING ALL PROJECTS FROM THE DATABASE
         const projects = await Project.find()
             .populate('ProjectManager', 'name email')
@@ -53,9 +53,9 @@ exports.getAllProjects = async (req, res) => {
             success: true,
             message: "Projects fetched successfully",
             projects: projects
-        });   
+        });
 
-    }catch(err){
+    } catch (err) {
         console.error("Error in getAllProjects:", err);
         return res.status(500).json({
             success: false,
@@ -68,7 +68,7 @@ exports.getAllProjects = async (req, res) => {
 
 // GET PROJECT BY ID
 exports.getProjectById = async (req, res) => {
-    try{
+    try {
         // FETCHING PROJECT ID FROM THE REQUEST PARAMETERS
         const projectId = req.params.id;
         // VALIDATING THE PROJECT ID
@@ -83,7 +83,7 @@ exports.getProjectById = async (req, res) => {
             .populate('ProjectManager', 'name email')
             .populate('teamMembers', 'name email')
             .populate('task');
-        
+
         // SENDING SUCCESS RESPONSE 
         if (!project) {
             return res.status(404).json({
@@ -95,9 +95,9 @@ exports.getProjectById = async (req, res) => {
             success: true,
             message: "Project fetched successfully",
             project: project
-        });    
+        });
 
-    }catch(err){
+    } catch (err) {
         console.error("Error in getProjectById:", err);
         return res.status(500).json({
             success: false,
@@ -109,7 +109,7 @@ exports.getProjectById = async (req, res) => {
 
 // UPDATING THE PROJECT
 exports.updateProject = async (req, res) => {
-    try{
+    try {
         //FETCHING PROJECT ID FROM THE REQUEST PARAMETERS
         const projectId = req.params.id;
 
@@ -125,10 +125,10 @@ exports.updateProject = async (req, res) => {
         }
 
         // UPDATING THE PROJECT IN THE DATABASE
-        const updatedProject = await Project.findByIdAndUpdate(projectId, update, { new: true , runValidators: true })
+        const updatedProject = await Project.findByIdAndUpdate(projectId, update, { new: true, runValidators: true })
             .populate('ProjectManager', 'name email')
             .populate('teamMembers', 'name email')
-            .populate('task'); 
+            .populate('task');
 
         // SENDING SUCCESS RESPONSE 
         if (!updatedProject) {
@@ -138,7 +138,7 @@ exports.updateProject = async (req, res) => {
             });
         }
 
-    }catch(err){
+    } catch (err) {
         console.error("Error in updateProject:", err);
         return res.status(500).json({
             success: false,
@@ -150,7 +150,7 @@ exports.updateProject = async (req, res) => {
 
 // SOFT DELETE PROJECT
 exports.softDeleteProject = async (req, res) => {
-    try{
+    try {
         // FETCHING PROJECT ID FROM THE REQUEST PARAMETERS
         const projectId = req.params.id;
 
@@ -168,8 +168,8 @@ exports.softDeleteProject = async (req, res) => {
             { isDeleted: true },
             { new: true, runValidators: true }
         ).populate('ProjectManager', 'name email')
-         .populate('teamMembers', 'name email')
-         .populate('task');
+            .populate('teamMembers', 'name email')
+            .populate('task');
 
         // SENDING SUCCESS RESPONSE
         return res.status(200).json({
@@ -177,8 +177,49 @@ exports.softDeleteProject = async (req, res) => {
             message: "Project soft deleted successfully",
             project: updatedProject
         });
-    }catch(err){
+    } catch (err) {
         console.error("Error in softDeleteProject:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+}
+
+
+// RESTORING SOFT DELETED PROJECT
+exports.restoreProject = async (req, res) => {
+    try {
+        // FETCHING PROJECT ID FROM THE REQUEST PARAMETERS
+        const projectId = req.params.id;
+
+        // VALIDATING THE PROJECT ID
+        if (!projectId) {
+            return res.status(400).json({
+                success: false,
+                message: "Project ID is required"
+            });
+        }
+
+        // RESTORING THE SOFT DELETED PROJECT BY UPDATING THE IS_DELETED FIELD
+        const restoredProject = await Project.findByIdAndUpdate(
+            projectId,
+            { isDeleted: false },
+            { new: true, runValidators: true }
+        ).populate('ProjectManager', 'name email')
+            .populate('teamMembers', 'name email')
+            .populate('task');
+
+        // SENDING SUCCESS RESPONSE
+        return res.status(200).json({
+            success: true,
+            message: "Project restored successfully",
+            project: restoredProject
+        });
+
+    } catch (err) {
+        console.error("Error in restoreProject:", err);
         return res.status(500).json({
             success: false,
             message: "Internal server error",
@@ -189,12 +230,12 @@ exports.softDeleteProject = async (req, res) => {
 
 // DELETE PROJECT
 exports.deleteProject = async (req, res) => {
-    try{
+    try {
         // FETCHING PROJECT ID FROM THE REQUEST PARAMETERS
         const projectId = req.params.id;
 
         // VALIDATING THE PROJECT ID
-        if (!projectId) {   
+        if (!projectId) {
             return res.status(400).json({
                 success: false,
                 message: "Project ID is required"
@@ -210,7 +251,7 @@ exports.deleteProject = async (req, res) => {
             message: "Project deleted successfully"
         });
 
-    }catch(err){
+    } catch (err) {
         console.error("Error in deleteProject:", err);
         return res.status(500).json({
             success: false,
