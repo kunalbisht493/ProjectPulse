@@ -1,6 +1,6 @@
-const Project = require('../Models/Project');
-const User = require('../Models/User');
-const Task = require('../Models/Task');
+const Project = require('../Models/ProjectSchema');
+const User = require('../Models/UserSchema');
+const Task = require('../Models/TaskSchema');
 
 // CREATE A NEW PROJECT
 exports.createProject = async (req, res) => {
@@ -8,11 +8,21 @@ exports.createProject = async (req, res) => {
         // FETCHING DATA FROM THE REQUEST BODY
         const { title, description, deadline, ProjectManager, teamMembers, task } = req.body;
 
+        // FETCHING PROJECT MANAGER FROM THE DATABASE
+        const projectManager = await User.findOne({ name: ProjectManager });
+        console.log("Project Manager:", projectManager);
+        if (!projectManager) {
+            return res.status(404).json({
+                success: false,
+                message: "Project Manager not found"
+            })
+        }
+
         // VALIDATING THE REQUEST BODY
         if (!title || !description || !deadline || !ProjectManager) {
             return res.status(400).json({
                 success: false,
-                message: "Please provide all required fields: title, description, deadline, ProjectManager"
+                message: "Please provide all required fields"
             });
         }
         // CREATING A PROJECT AND SAVING IT TO THE DATABASE
@@ -20,7 +30,7 @@ exports.createProject = async (req, res) => {
             title,
             description,
             deadline,
-            ProjectManager,
+            ProjectManager: projectManager._id,
             teamMembers: teamMembers || [],
             task: task || []
         })
@@ -39,6 +49,7 @@ exports.createProject = async (req, res) => {
         });
     }
 }
+
 
 // GET ALL PROJECTS
 exports.getAllProjects = async (req, res) => {

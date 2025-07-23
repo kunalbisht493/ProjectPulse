@@ -12,9 +12,9 @@ connectDB();
 // Middleware
 app.use(express.json());
 
-app.get('/', (req, res) => {
-    res.send('Welcome to ProjectPulse API');
-})
+// Importing routes
+const routes = require('./Routes/routes');
+app.use('/api/v1',routes);
 
 // SERVER LISTENING
 app.listen(PORT, (err) => {

@@ -1,11 +1,13 @@
 const User = require('../Models/UserSchema');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+
+require('dotenv').config();
 
 
 // User Sign Up Function
 // This function handles user registration by checking if the user already exists,
-exports.signUp = async (req, res) => {
+exports.signup = async (req, res) => {
     try {
         // FETCHING USER DATA FROM REQUEST BODY
         const { name, password, email, role } = req.body;

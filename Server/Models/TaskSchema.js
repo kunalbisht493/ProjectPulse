@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
 const TaskSchema = new mongoose.Schema({
-    title:{
-        type: String,
-        required: true,
-    },
     description:{
         type: String,
         required: true,
@@ -28,7 +24,11 @@ const TaskSchema = new mongoose.Schema({
         enum:['low', 'medium', 'high'],
         default: 'medium',
     },
-    ProjectId:{
+    comments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment'
+    }],
+    projectName:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Project',
         required: true
