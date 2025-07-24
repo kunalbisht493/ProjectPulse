@@ -28,7 +28,7 @@ const TaskSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Comment'
     }],
-    projectName:{
+    project:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Project',
         required: true

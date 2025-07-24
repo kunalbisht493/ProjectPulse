@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Project = require('../Models/ProjectSchema');
 const User = require('../Models/UserSchema');
 const Task = require('../Models/TaskSchema');
@@ -10,7 +11,6 @@ exports.createProject = async (req, res) => {
 
         // FETCHING PROJECT MANAGER FROM THE DATABASE
         const projectManager = await User.findOne({ name: ProjectManager });
-        console.log("Project Manager:", projectManager);
         if (!projectManager) {
             return res.status(404).json({
                 success: false,
@@ -58,7 +58,7 @@ exports.getAllProjects = async (req, res) => {
         const projects = await Project.find()
             .populate('ProjectManager', 'name email')
             .populate('teamMembers', 'name email')
-            .populate('task');
+            .populate('task', 'description dueDate assignedTo status priority');
         // SENDING SUCCESS RESPONSE
         return res.status(200).json({
             success: true,
@@ -125,7 +125,14 @@ exports.updateProject = async (req, res) => {
         const projectId = req.params.id;
 
         //FETCHING DATA FROM THE REQUEST BODY
-        const update = req.body;
+       const {title, description, deadline, ProjectManager, teamMembers, task} = req.body;
+       const user = await User.findOne({ name:ProjectManager });
+       if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "Project Manager not found"
+            });
+        }
 
         // VALIDATING THE PROJECT ID
         if (!projectId) {
@@ -135,20 +142,28 @@ exports.updateProject = async (req, res) => {
             });
         }
 
+
+
         // UPDATING THE PROJECT IN THE DATABASE
-        const updatedProject = await Project.findByIdAndUpdate(projectId, update, { new: true, runValidators: true })
+        const updatedProject = await Project.findByIdAndUpdate(
+            projectId, {title,description, deadline, ProjectManager:user._id, teamMembers, task},{ new: true, runValidators: true })
             .populate('ProjectManager', 'name email')
             .populate('teamMembers', 'name email')
             .populate('task');
 
-        // SENDING SUCCESS RESPONSE 
         if (!updatedProject) {
             return res.status(404).json({
                 success: false,
                 message: "Project not found"
             });
         }
-
+        // SENDING SUCCESS RESPONSE
+        return res.status(200).json({
+            success: true,
+            message: "Project updated successfully",
+            project: updatedProject
+        });
+    
     } catch (err) {
         console.error("Error in updateProject:", err);
         return res.status(500).json({
@@ -181,6 +196,9 @@ exports.softDeleteProject = async (req, res) => {
         ).populate('ProjectManager', 'name email')
             .populate('teamMembers', 'name email')
             .populate('task');
+        
+        // DELETING TASKS ASSOCIATED WITH THE PROJECT
+        await Task.updateMany( projectId , {isDeleted: true,});
 
         // SENDING SUCCESS RESPONSE
         return res.status(200).json({
@@ -221,6 +239,9 @@ exports.restoreProject = async (req, res) => {
         ).populate('ProjectManager', 'name email')
             .populate('teamMembers', 'name email')
             .populate('task');
+        
+        // RESTORING TASKS ASSOCIATED WITH THE PROJECT
+        await Task.updateMany({ project: projectId }, { isDeleted: false });
 
         // SENDING SUCCESS RESPONSE
         return res.status(200).json({
@@ -256,10 +277,15 @@ exports.deleteProject = async (req, res) => {
         // DELETING THE PROJECT FROM THE DATABASE
         const deletedProject = await Project.findByIdAndDelete(projectId);
 
+        // DELETING TASKS ASSOCIATED WITH THE PROJECT
+        const deletedTask= await Task.deleteMany({ project:new mongoose.Types.ObjectId(projectId) });
+        // console.log("Deleted Task:", deletedTask.deletedCount);
+
         // SENDING SUCCESS RESPONSE  
         return res.status(200).json({
             success: true,
-            message: "Project deleted successfully"
+            message: "Project deleted successfully",
+            deletedProject: deletedProject
         });
 
     } catch (err) {

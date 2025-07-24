@@ -1,16 +1,15 @@
-const Task = require('../Models/TaskSchema');
 const Project = require('../Models/ProjectSchema');
+const Task = require('../Models/TaskSchema');
 const User = require('../Models/UserSchema');
 
 // CREATING A NEW TASK
 exports.createTask = async (req, res) => {
     try {
         // FETCHING DATA FROM THE REQUEST BODY
-        const { description, dueDate, assignedTo, projectName, priority } = req.body;
+        const { description, dueDate, assignedTo, project, priority } = req.body;
 
         // FETCHING USER FROM THE DATABASE
         const user = await User.findOne({name:assignedTo});
-        console.log("Assigned User:", user);
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -18,8 +17,8 @@ exports.createTask = async (req, res) => {
             })
         }
         // FETCHING PROJECT FROM THE DATABASE
-        const project = await Project.findOne({title: projectName});
-        if (!project) {
+        const projectData = await Project.findOne({title: project});
+        if (!projectData) {
             return res.status(404).json({
                 success: false,
                 message: "Project not found"
@@ -38,12 +37,12 @@ exports.createTask = async (req, res) => {
             dueDate,
             assignedTo: user._id,
             priority: priority || 'medium',
-            projectName: project._id
+            project: projectData._id
         })
 
         // ADDING THE TASK TO THE PROJECT TASKS ARRAY
         await Project.findByIdAndUpdate(
-            project, { $push: { task: newTask._id } }, { new: true }).populate('task').exec();
+            projectData, { $push: { task: newTask._id } }, { new: true }).populate('task').exec();
 
         // SENDING SUCCESS RESPONSE
         return res.status(200).json({

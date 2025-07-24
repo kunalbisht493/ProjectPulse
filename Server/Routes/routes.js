@@ -11,11 +11,11 @@ router.post('/signup', signup);
 router.post('/login', login);
 
 // PROJECT ROUTES
-router.post('/createProject', createProject);
-router.get('/getAllProjects', getAllProjects);
-router.get('/getProjectById/:id', getProjectById);
-router.put('/updateProject/:id', updateProject);
-router.put('/deleteProject/:id', deleteProject);
+router.post('/createproject', createProject);
+router.get('/getallprojects', getAllProjects);
+router.get('/getproject/:id', getProjectById);
+router.put('/updateproject/:id', updateProject);
+router.put('/deleteproject/:id', deleteProject);
 
 // TASK ROUTES
 router.post('/createTask', createTask);
