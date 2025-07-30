@@ -54,13 +54,17 @@ exports.createProject = async (req, res) => {
 // GET ALL PROJECTS
 exports.getAllProjects = async (req, res) => {
     try {
-        // FETCHING ALL PROJECTS FROM THE DATABASE
-        const projects = await Project.find()
-            .populate('ProjectManager', 'name email')
-            .populate('teamMembers', 'name email')
-            .populate('task', 'description dueDate assignedTo status priority');
-        // SENDING SUCCESS RESPONSE
-        return res.status(200).json({
+        let projects;
+
+        if (req.user.role === 'admin') {
+            // Admin: See all projects
+            projects = await Project.find().populate('ProjectManager', 'name email');
+        } else {
+            // User: See only their own projects
+            projects = await Project.find({ ProjectManager: req.user.userId }).populate('ProjectManager', 'name email');
+        }
+
+        res.status(200).json({
             success: true,
             message: "Projects fetched successfully",
             projects: projects
@@ -70,11 +74,12 @@ exports.getAllProjects = async (req, res) => {
         console.error("Error in getAllProjects:", err);
         return res.status(500).json({
             success: false,
-            message: "Internal server error",
-            error: err.message
+            message: "Internal Server Error",
         });
     }
-}
+};
+
+
 
 
 // GET PROJECT BY ID
@@ -125,9 +130,9 @@ exports.updateProject = async (req, res) => {
         const projectId = req.params.id;
 
         //FETCHING DATA FROM THE REQUEST BODY
-       const {title, description, deadline, ProjectManager, teamMembers, task} = req.body;
-       const user = await User.findOne({ name:ProjectManager });
-       if (!user) {
+        const { title, description, deadline, ProjectManager, teamMembers, task } = req.body;
+        const user = await User.findOne({ name: ProjectManager });
+        if (!user) {
             return res.status(404).json({
                 success: false,
                 message: "Project Manager not found"
@@ -143,10 +148,9 @@ exports.updateProject = async (req, res) => {
         }
 
 
-
         // UPDATING THE PROJECT IN THE DATABASE
         const updatedProject = await Project.findByIdAndUpdate(
-            projectId, {title,description, deadline, ProjectManager:user._id, teamMembers, task},{ new: true, runValidators: true })
+            projectId, { title, description, deadline, ProjectManager: user._id, teamMembers, task }, { new: true, runValidators: true })
             .populate('ProjectManager', 'name email')
             .populate('teamMembers', 'name email')
             .populate('task');
@@ -163,7 +167,7 @@ exports.updateProject = async (req, res) => {
             message: "Project updated successfully",
             project: updatedProject
         });
-    
+
     } catch (err) {
         console.error("Error in updateProject:", err);
         return res.status(500).json({
@@ -196,9 +200,9 @@ exports.softDeleteProject = async (req, res) => {
         ).populate('ProjectManager', 'name email')
             .populate('teamMembers', 'name email')
             .populate('task');
-        
+
         // DELETING TASKS ASSOCIATED WITH THE PROJECT
-        await Task.updateMany( projectId , {isDeleted: true,});
+        await Task.updateMany(projectId, { isDeleted: true, });
 
         // SENDING SUCCESS RESPONSE
         return res.status(200).json({
@@ -239,7 +243,7 @@ exports.restoreProject = async (req, res) => {
         ).populate('ProjectManager', 'name email')
             .populate('teamMembers', 'name email')
             .populate('task');
-        
+
         // RESTORING TASKS ASSOCIATED WITH THE PROJECT
         await Task.updateMany({ project: projectId }, { isDeleted: false });
 
@@ -278,7 +282,7 @@ exports.deleteProject = async (req, res) => {
         const deletedProject = await Project.findByIdAndDelete(projectId);
 
         // DELETING TASKS ASSOCIATED WITH THE PROJECT
-        const deletedTask= await Task.deleteMany({ project:new mongoose.Types.ObjectId(projectId) });
+        const deletedTask = await Task.deleteMany({ project: new mongoose.Types.ObjectId(projectId) });
         // console.log("Deleted Task:", deletedTask.deletedCount);
 
         // SENDING SUCCESS RESPONSE  

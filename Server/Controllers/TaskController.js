@@ -42,7 +42,7 @@ exports.createTask = async (req, res) => {
 
         // ADDING THE TASK TO THE PROJECT TASKS ARRAY
         await Project.findByIdAndUpdate(
-            projectData, { $push: { task: newTask._id } }, { new: true }).populate('task').exec();
+            projectData, { $addToSet: { task: newTask._id , teamMembers:newTask.assignedTo } }, { new: true }).populate('task').exec();
 
         // SENDING SUCCESS RESPONSE
         return res.status(200).json({
