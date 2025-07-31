@@ -1,9 +1,8 @@
-// import {ToastContainer} from 'react-toastify';
-import { useState,useEffect } from 'react';
-import { Routes, Route, Navigate,useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import Header from './Components/Header';
-import Auth from './Pages/Auth';
 import Sidebar from './Components/Sidebar';
+import Auth from './Pages/Auth';
 import LandingPage from './Pages/LandingPage';
 import Dashboard from './Pages/Dashboard';
 import Project from './Pages/Project';
@@ -12,41 +11,46 @@ import { ToastContainer } from 'react-toastify';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const location = useLocation();
 
-   useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-          setIsLoggedIn(true);
-          navigate('/')
-        }
-    }, []);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+    if (token && location.pathname === '/auth') {
+      navigate('/');
+    }
+  }, []);
+
+  // Protect routes
+  const PrivateRoute = ({ children }) => {
+    return isLoggedIn ? children : <Navigate to="/auth" />;
+  };
+
   return (
     <>
-      {isLoggedIn && <Header />}
+      {isLoggedIn && <Header setIsLoggedIn={setIsLoggedIn} />}
+      <div className="flex h-screen">
+        {isLoggedIn && <Sidebar />}
 
-      {isLoggedIn ? (
-        <div className="flex h-screen">
-          <Sidebar />
-          <div className="flex-grow overflow-y-auto">
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/Dashboard" element={<Dashboard />} />
-              <Route path="/Project" element={<Project />} />
-              <Route path="/Trash" element={<Trash />} />
-            </Routes>
-            <ToastContainer></ToastContainer>
-          </div>
+        <div className="flex-grow overflow-y-auto">
+          <Routes>
+            {/* Public route */}
+            <Route path="/auth" element={<Auth setIsLoggedIn={setIsLoggedIn} />} />
+
+            {/* Private routes */}
+            <Route path="/" element={<PrivateRoute><LandingPage /></PrivateRoute>} />
+            <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            <Route path="/project" element={<PrivateRoute><Project /></PrivateRoute>} />
+            <Route path="/trash" element={<PrivateRoute><Trash /></PrivateRoute>} />
+
+            {/* Catch-all */}
+            <Route path="*" element={<Navigate to={isLoggedIn ? "/" : "/auth"} />} />
+          </Routes>
+
+          <ToastContainer />
         </div>
-      ) : (<div>
-        <Routes>
-          <Route path="/Auth" element={<Auth setIsLoggedIn={setIsLoggedIn} />} />
-          <Route path="*" element={<Navigate to="/Auth" />} />
-        </Routes>
-        <ToastContainer></ToastContainer>
       </div>
-
-      )}
     </>
   );
 }

@@ -12,6 +12,7 @@ function CreateProject({ onClose }) {
         deadline: ''
     });
 
+    //FOR POPU ANIMATION
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
