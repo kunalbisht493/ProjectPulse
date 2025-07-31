@@ -7,7 +7,7 @@ const Task = require('../Models/TaskSchema');
 exports.createProject = async (req, res) => {
     try {
         // FETCHING DATA FROM THE REQUEST BODY
-        const { title, description, deadline, ProjectManager, teamMembers, task } = req.body;
+        const { name, description, deadline, ProjectManager, teamMembers, task } = req.body;
 
         // FETCHING PROJECT MANAGER FROM THE DATABASE
         const projectManager = await User.findOne({ name: ProjectManager });
@@ -19,7 +19,7 @@ exports.createProject = async (req, res) => {
         }
 
         // VALIDATING THE REQUEST BODY
-        if (!title || !description || !deadline || !ProjectManager) {
+        if (!name || !description || !deadline || !ProjectManager) {
             return res.status(400).json({
                 success: false,
                 message: "Please provide all required fields"
@@ -27,7 +27,7 @@ exports.createProject = async (req, res) => {
         }
         // CREATING A PROJECT AND SAVING IT TO THE DATABASE
         const newProject = await Project.create({
-            title,
+            name,
             description,
             deadline,
             ProjectManager: projectManager._id,

@@ -1,5 +1,5 @@
 import {toast} from 'react-toastify';
-export const showSucess=(message)=>{
+export const showSuccess=(message)=>{
     toast.success(message,{
         position:"top-center",
         autoClose:3000

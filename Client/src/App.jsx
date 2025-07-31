@@ -1,8 +1,8 @@
 // import {ToastContainer} from 'react-toastify';
-import { useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { useState,useEffect } from 'react';
+import { Routes, Route, Navigate,useNavigate } from 'react-router-dom';
 import Header from './Components/Header';
-import User from './Pages/User';
+import Auth from './Pages/Auth';
 import Sidebar from './Components/Sidebar';
 import LandingPage from './Pages/LandingPage';
 import Dashboard from './Pages/Dashboard';
@@ -12,7 +12,15 @@ import { ToastContainer } from 'react-toastify';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate()
 
+   useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+          setIsLoggedIn(true);
+          navigate('/')
+        }
+    }, []);
   return (
     <>
       {isLoggedIn && <Header />}
@@ -32,7 +40,7 @@ function App() {
         </div>
       ) : (<div>
         <Routes>
-          <Route path="/Auth" element={<User setIsLoggedIn={setIsLoggedIn} />} />
+          <Route path="/Auth" element={<Auth setIsLoggedIn={setIsLoggedIn} />} />
           <Route path="*" element={<Navigate to="/Auth" />} />
         </Routes>
         <ToastContainer></ToastContainer>
