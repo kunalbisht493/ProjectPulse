@@ -1,25 +1,20 @@
-import { useState } from "react";
+import { useContext } from "react";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import { showError, showSuccess } from "../Utils/Toast";
+import { AppContext } from "../Context/AppContext";
 
 function Auth({ setIsLoggedIn }) {
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        password: "",
-        role: ""
-    });
-    const [isSignUp, setIsSignUp] = useState(false);
+    const {userData ,setUserData , isSignUp ,setIsSignUp} = useContext(AppContext);
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value.trim() });
+        setUserData({ ...userData, [e.target.name]: e.target.value});
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { name, email, password, role } = formData;
+        const { name, email, password, role } = userData;
         const payload = { email, password };
 
         if (isSignUp) {
@@ -37,16 +32,16 @@ function Auth({ setIsLoggedIn }) {
                     "Content-Type": "application/json"
                 }
             });
-            console.log(res)
-
+         
             if (isSignUp) {
                 showSuccess(res.data.message);
                 setIsSignUp(false);
-                setFormData({ name: "", email: "", password: "", role: "" });
+                setUserData({ name: "", email: "", password: "", role: "" });
             } else {
                 showSuccess("Login successful");
                 setIsLoggedIn(true);
                 localStorage.setItem("token", res.data.token)
+                localStorage.setItem("userName",res.data.user.name)
                 navigate("/");
             }
 
@@ -121,7 +116,7 @@ function Auth({ setIsLoggedIn }) {
                                     type="email"
                                     placeholder="Email"
                                     name="email"
-                                    value={formData.email}
+                                    value={userData.email}
                                     onChange={handleChange}
                                     required
                                     className="w-full p-3 border border-gray-300/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm hover:bg-white focus:bg-white"
@@ -130,7 +125,7 @@ function Auth({ setIsLoggedIn }) {
                                     type="password"
                                     placeholder="Password"
                                     name="password"
-                                    value={formData.password}
+                                    value={userData.password}
                                     onChange={handleChange}
                                     required
                                     className="w-full p-3 border border-gray-300/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm hover:bg-white focus:bg-white"
@@ -151,7 +146,7 @@ function Auth({ setIsLoggedIn }) {
                                     type="text"
                                     placeholder="Name"
                                     name="name"
-                                    value={formData.name}
+                                    value={userData.name}
                                     onChange={handleChange}
                                     required
                                     className="w-full p-3 border border-gray-300/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm hover:bg-white focus:bg-white"
@@ -160,7 +155,7 @@ function Auth({ setIsLoggedIn }) {
                                     type="email"
                                     placeholder="Email"
                                     name="email"
-                                    value={formData.email}
+                                    value={userData.email}
                                     onChange={handleChange}
                                     required
                                     className="w-full p-3 border border-gray-300/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm hover:bg-white focus:bg-white"
@@ -169,7 +164,7 @@ function Auth({ setIsLoggedIn }) {
                                     type="password"
                                     placeholder="Password"
                                     name="password"
-                                    value={formData.password}
+                                    value={userData.password}
                                     onChange={handleChange}
                                     required
                                     className="w-full p-3 border border-gray-300/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm hover:bg-white focus:bg-white"
@@ -178,7 +173,7 @@ function Auth({ setIsLoggedIn }) {
                                     type="text"
                                     placeholder="Role"
                                     name="role"
-                                    value={formData.role}
+                                    value={userData.role}
                                     onChange={handleChange}
                                     className="w-full p-3 border border-gray-300/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm hover:bg-white focus:bg-white"
                                 />

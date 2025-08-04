@@ -97,7 +97,7 @@ exports.login = async (req, res) => {
         if (isPasswordValid) {
             // CREATING JWT TOKEN
             const payload = { userId: user._id, role: user.role };
-            const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '2h' });
             // SENDING SUCCESS RESPONSE WITH TOKEN
             return res.status(200).json({
                 success: true,

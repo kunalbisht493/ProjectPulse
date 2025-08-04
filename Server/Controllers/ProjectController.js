@@ -52,32 +52,44 @@ exports.createProject = async (req, res) => {
 
 
 // GET ALL PROJECTS
-exports.getAllProjects = async (req, res) => {
+exports.getProjects = async (req, res) => {
     try {
-        let projects;
+        // Ensure ObjectId comparison works
+        const userId = new mongoose.Types.ObjectId(req.user.id);
 
-        if (req.user.role === 'admin') {
-            // Admin: See all projects
-            projects = await Project.find().populate('ProjectManager', 'name email');
-        } else {
-            // User: See only their own projects
-            projects = await Project.find({ ProjectManager: req.user.userId }).populate('ProjectManager', 'name email');
+        // Base query: only non-deleted projects
+        let query = { isDeleted: { $ne: true } };
+
+        if (req.user.role !== 'admin') {
+            // Filter for non-admins to only show relevant projects
+            query.$or = [
+                { ProjectManager: userId },
+                { teamMembers: userId }
+            ];
         }
 
-        res.status(200).json({
+        const projects = await Project.find(query)
+            .populate('ProjectManager', 'name email')
+            .populate('teamMembers', 'name email');
+
+        return res.status(200).json({
             success: true,
             message: "Projects fetched successfully",
-            projects: projects
+            projects
         });
 
     } catch (err) {
-        console.error("Error in getAllProjects:", err);
+        console.error("Error in getProjects:", err);
         return res.status(500).json({
             success: false,
             message: "Internal Server Error",
+            error: err.message
         });
     }
 };
+
+
+
 
 
 

@@ -1,17 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { showError, showSuccess } from "../Utils/Toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { AppContext } from "../Context/AppContext";
 
-function CreateProject({ onClose }) {
+function CreateProject({ onClose }){
+    const {projectData ,setProjectData}=useContext(AppContext)
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        ProjectManager: '',
-        deadline: ''
-    });
-
     //FOR POPU ANIMATION
     const [isVisible, setIsVisible] = useState(false);
 
@@ -31,7 +26,7 @@ function CreateProject({ onClose }) {
     // SENDING RESPONSE TO BACKEND
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { name, description, ProjectManager, deadline } = formData
+        const { name, description, ProjectManager, deadline } = projectData
         const payload = { name, description, ProjectManager, deadline }
         try {
             const URL = "http://localhost:4000/api/v1/project/createproject"
@@ -41,7 +36,7 @@ function CreateProject({ onClose }) {
                 }
             })
             showSuccess(res.data.message)
-            setFormData({ name: "", description: "", ProjectManager: "", deadline: "" })
+            setProjectData({ name: "", description: "", ProjectManager: "", deadline: "" })
             navigate('/Project')
             onClose()
         } catch (err) {
@@ -52,7 +47,7 @@ function CreateProject({ onClose }) {
     };
 
     const handleInputChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value })
+        setProjectData({ ...projectData, [e.target.name]: e.target.value })
     };
 
     return (
@@ -73,7 +68,7 @@ function CreateProject({ onClose }) {
                         </label>
                         <input
                             name="name"
-                            value={formData.name}
+                            value={projectData.name}
                             onChange={handleInputChange}
                             placeholder="Enter project name"
                             type="text"
@@ -88,7 +83,7 @@ function CreateProject({ onClose }) {
                         </label>
                         <input
                             name="ProjectManager"
-                            value={formData.ProjectManager}
+                            value={projectData.ProjectManager}
                             onChange={handleInputChange}
                             placeholder="Enter manager name"
                             type="text"
@@ -103,7 +98,7 @@ function CreateProject({ onClose }) {
                         </label>
                         <textarea
                             name="description"
-                            value={formData.description}
+                            value={projectData.description}
                             onChange={handleInputChange}
                             placeholder="Brief description of your project"
                             rows="2"
@@ -117,7 +112,7 @@ function CreateProject({ onClose }) {
                         </label>
                         <input
                             name="deadline"
-                            value={formData.deadline}
+                            value={projectData.deadline}
                             onChange={handleInputChange}
                             type="date"
                             required

@@ -15,7 +15,10 @@ exports.auth = async (req, res, next) => {
         const token = authHeader.split(" ")[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        req.user = decoded; // Attach decoded token to request
+        req.user = {
+            id: decoded.userId,
+            role: decoded.role,
+        }; // Attach decoded token to request
         next(); // Proceed to the next middleware or route
     } catch (err) {
         return res.status(401).json({
@@ -26,22 +29,3 @@ exports.auth = async (req, res, next) => {
     }
 };
 
-// ADMIN CHECK MIDDLEWARE
-exports.isAdmin = (req, res, next) => {
-    try {
-        if (req.user.role === "admin") {
-            next(); // Proceed to the controller
-        } else {
-            return res.status(403).json({
-                success: false,
-                message: "Unauthorized: Admins only"
-            });
-        }
-    } catch (err) {
-        return res.status(500).json({
-            success: false,
-            message: "Internal server error",
-            error: err.message
-        });
-    }
-};

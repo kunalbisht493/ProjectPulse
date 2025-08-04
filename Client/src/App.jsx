@@ -7,25 +7,28 @@ import LandingPage from './Pages/LandingPage';
 import Dashboard from './Pages/Dashboard';
 import Project from './Pages/Project';
 import Trash from './Pages/Trash';
+import Task from './Pages/Task'
 import { ToastContainer } from 'react-toastify';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true); 
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
-    if (token && location.pathname === '/auth') {
-      navigate('/');
-    }
+    setLoading(false)
   }, []);
 
   // Protect routes
   const PrivateRoute = ({ children }) => {
     return isLoggedIn ? children : <Navigate to="/auth" />;
   };
+    // While checking token, don't render anything
+  if (loading) return null;
+
 
   return (
     <>
@@ -43,9 +46,10 @@ function App() {
             <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
             <Route path="/project" element={<PrivateRoute><Project /></PrivateRoute>} />
             <Route path="/trash" element={<PrivateRoute><Trash /></PrivateRoute>} />
+            <Route path="/task" element={<PrivateRoute><Task /></PrivateRoute>} />
 
             {/* Catch-all */}
-            <Route path="*" element={<Navigate to={isLoggedIn ? "/" : "/auth"} />} />
+           <Route path="*" element={<Navigate to={isLoggedIn ? location.pathname : "/auth"} />} />
           </Routes>
 
           <ToastContainer />

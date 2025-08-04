@@ -1,15 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { showSuccess } from "../Utils/Toast";
-
+import getInitials from "../Utils/getInitials";
 function Header({setIsLoggedIn}) {
     const navigate = useNavigate()
+    const userName = localStorage.getItem("userName")
+    const initials = getInitials(userName)
     const handleLogout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("userName")
         setIsLoggedIn(false)
         showSuccess("Logout Successfully")
         navigate('/auth')
     };
-
     return (
         <>
             <header className="flex items-center justify-between bg-gradient-to-b from-blue-500 to-blue-600 h-18 px-14">
@@ -19,7 +21,7 @@ function Header({setIsLoggedIn}) {
                     {/* User Avatar */}
                     <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                            <span className="text-blue-600 font-semibold text-lg">KB</span>
+                            <span className="text-blue-600 font-semibold text-lg">{initials}</span>
                         </div>
                     </div>
 

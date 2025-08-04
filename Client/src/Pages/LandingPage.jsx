@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useContext } from "react";
+import { AppContext } from "../Context/AppContext";
 import CreateProject from "./CreateProject";
 function LandingPage() {
-        const [showModal, setShowModal] = useState(false);
+    const {showModal,setShowModal}=useContext(AppContext);
     return (
         <div className="flex flex-col justify-center items-center w-full h-screen bg-gradient-to-br from-gray-50 to-white relative">
             {/* Subtle background decoration */}
