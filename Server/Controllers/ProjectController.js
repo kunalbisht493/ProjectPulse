@@ -91,9 +91,6 @@ exports.getProjects = async (req, res) => {
 
 
 
-
-
-
 // GET PROJECT BY ID
 exports.getProjectById = async (req, res) => {
     try {
@@ -134,6 +131,7 @@ exports.getProjectById = async (req, res) => {
         });
     }
 }
+
 
 // UPDATING THE PROJECT
 exports.updateProject = async (req, res) => {
@@ -190,6 +188,7 @@ exports.updateProject = async (req, res) => {
     }
 }
 
+
 // SOFT DELETE PROJECT
 exports.softDeleteProject = async (req, res) => {
     try {
@@ -214,12 +213,12 @@ exports.softDeleteProject = async (req, res) => {
             .populate('task');
 
         // DELETING TASKS ASSOCIATED WITH THE PROJECT
-        await Task.updateMany(projectId, { isDeleted: true, });
+        await Task.updateMany({ projectId }, { isDeleted: true, });
 
         // SENDING SUCCESS RESPONSE
         return res.status(200).json({
             success: true,
-            message: "Project soft deleted successfully",
+            message: "Moved to trash ",
             project: updatedProject
         });
     } catch (err) {
@@ -231,6 +230,41 @@ exports.softDeleteProject = async (req, res) => {
         });
     }
 }
+
+
+// GET SOFTDELETE PROJECT
+exports.getTrashedProjects = async (req, res) => {
+    try {
+        const userId = new mongoose.Types.ObjectId(req.user.id);
+
+        let query = { isDeleted: true };
+
+        if (req.user.role !== 'admin') {
+            query.$or = [
+                { ProjectManager: userId },
+                { teamMembers: userId }
+            ];
+        }
+
+        const trashedProjects = await Project.find(query)
+            .populate('ProjectManager', 'name email')
+            .populate('teamMembers', 'name email');
+
+        return res.status(200).json({
+            success: true,
+            message: "Trashed projects fetched successfully",
+            projects: trashedProjects
+        });
+
+    } catch (err) {
+        console.error("Error in getTrashedProjects:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: err.message
+        });
+    }
+};
 
 
 // RESTORING SOFT DELETED PROJECT
@@ -257,7 +291,7 @@ exports.restoreProject = async (req, res) => {
             .populate('task');
 
         // RESTORING TASKS ASSOCIATED WITH THE PROJECT
-        await Task.updateMany({ project: projectId }, { isDeleted: false });
+        await Task.updateMany({ projectId }, { isDeleted: false });
 
         // SENDING SUCCESS RESPONSE
         return res.status(200).json({

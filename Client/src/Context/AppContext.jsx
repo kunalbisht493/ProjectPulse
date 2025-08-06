@@ -24,6 +24,9 @@ export function AppContextProvider({ children }) {
     // FOR PROJECT DETAILS
     const [projectDetails , setProjectDetails]=useState([])
 
+    // TRASH
+    const [trashProject,setTrashProject]=useState([])
+
     // FOR CREATING PROJECT
     const [showModal, setShowModal] = useState(false);
     const values = {
@@ -36,7 +39,9 @@ export function AppContextProvider({ children }) {
         projectDetails,
         setProjectDetails,
         showModal,
-        setShowModal
+        setShowModal,
+        trashProject,
+        setTrashProject
     }
 
     return <AppContext.Provider value={values}>{children}</AppContext.Provider>

@@ -1,12 +1,14 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../Context/AppContext";
+import { Trash, Edit } from "lucide-react";
 import CreateProject from "./CreateProject";
-import { showError } from "../Utils/Toast";
+import { showError, showSuccess } from "../Utils/Toast";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
 
 function Project() {
-    const { projectDetails, setProjectDetails, showModal, setShowModal } = useContext(AppContext);
+    const { projectDetails, setProjectDetails, showModal, setShowModal} = useContext(AppContext);
+    const [editingProject, setEditingProject] = useState(null);
     const token = localStorage.getItem("token")
 
     useEffect(() => {
@@ -26,11 +28,37 @@ function Project() {
         fetchProject();
     }, [token, setProjectDetails])
 
-    const handleDelete = (e, projectId) => {
-        e.preventDefault(); // Prevent navigation when delete is clicked
+    // Handle editing a project
+    const handleEdit = (e, project) => {
+        e.preventDefault();
         e.stopPropagation();
-        // Add your delete logic here
-        console.log('Delete project:', projectId);
+        setEditingProject(project);
+        setShowModal(true);
+    };
+
+    // TEMP DELETE A PROJECT
+    const handleDelete = async (e, projectId) => {
+        e.preventDefault();
+        e.stopPropagation();
+        try {
+            const res = await axios.put(`http://localhost:4000/api/v1/project/${projectId}/softdelete`, {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+            setProjectDetails(prevProjects => prevProjects.filter(project => project._id !== projectId))
+            showSuccess(res.data.message)
+        } catch (err) {
+            showError(err.response?.data?.message || 'unable to move to trash');
+        }
+
+    };
+
+    // Close modal and reset editing state
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setEditingProject(null);
     };
 
     return (
@@ -84,12 +112,12 @@ function Project() {
                                 key={project._id}
                                 className="group bg-white/70 backdrop-blur-sm shadow-sm hover:shadow-md rounded-lg border border-gray-200/50 hover:border-blue-200/50 transition-all duration-300 hover:bg-white/90 transform hover:-translate-y-0.5"
                             >
-                                <div className="flex items-center justify-between p-4">
-                                    <NavLink to="/task" className="flex-1 text-center">
+                                <NavLink to="/task" className="flex items-center justify-between p-4">
+                                    <div  className="flex-1 text-center">
                                         <div className="font-medium text-gray-800 group-hover:text-blue-600 transition-colors duration-200 hover:underline">
                                             {project.name}
                                         </div>
-                                    </NavLink>
+                                    </div>
                                     <div className="flex-1 text-center">
                                         <div className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-50/50 text-blue-700 border border-blue-100/50">
                                             📅 {new Date(project.deadline).toLocaleDateString()}
@@ -101,15 +129,24 @@ function Project() {
                                         </div>
                                     </div>
                                     <div className="flex-1 text-center">
-                                        <button
-                                            onClick={(e) => handleDelete(e, project._id)}
-                                            className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-red-50/50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-all duration-200 hover:scale-110 group-hover:shadow-md border border-red-100/50 hover:border-red-200"
-                                            title="Delete Project"
-                                        >
-                                            🗑️
-                                        </button>
+                                        <div className="flex items-center justify-center gap-2">
+                                            <button
+                                                onClick={(e) => handleEdit(e, project)}
+                                                className="inline-flex items-center cursor-pointer justify-center w-10 h-10 rounded-full bg-blue-50/50 text-blue-500 hover:bg-blue-100 hover:text-blue-600 transition-all duration-200 hover:scale-110 group-hover:shadow-md border border-blue-100/50 hover:border-blue-200"
+                                                title="Edit Project"
+                                            >
+                                                <Edit size={16}></Edit>
+                                            </button>
+                                            <button
+                                                onClick={(e) => handleDelete(e, project._id)}
+                                                className="inline-flex items-center cursor-pointer justify-center w-10 h-10 rounded-full bg-red-50/50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-all duration-200 hover:scale-110 group-hover:shadow-md border border-red-100/50 hover:border-red-200"
+                                                title="Delete Project"
+                                            >
+                                                <Trash size={16}></Trash>
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
+                                </NavLink>
                             </div>
                         ))
                     ) : (
@@ -126,7 +163,10 @@ function Project() {
 
             {/* Modal */}
             {showModal && (
-                <CreateProject onClose={() => setShowModal(false)} />
+                <CreateProject 
+                    onClose={handleCloseModal} 
+                    editingProject={editingProject}
+                />
             )}
         </div>
     );

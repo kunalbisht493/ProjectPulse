@@ -6,7 +6,7 @@ import Auth from './Pages/Auth';
 import LandingPage from './Pages/LandingPage';
 import Dashboard from './Pages/Dashboard';
 import Project from './Pages/Project';
-import Trash from './Pages/Trash';
+import TrashProject from './Pages/TrashProject';
 import Task from './Pages/Task'
 import { ToastContainer } from 'react-toastify';
 
@@ -45,7 +45,7 @@ function App() {
             <Route path="/" element={<PrivateRoute><LandingPage /></PrivateRoute>} />
             <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
             <Route path="/project" element={<PrivateRoute><Project /></PrivateRoute>} />
-            <Route path="/trash" element={<PrivateRoute><Trash /></PrivateRoute>} />
+            <Route path="/trash" element={<PrivateRoute><TrashProject /></PrivateRoute>} />
             <Route path="/task" element={<PrivateRoute><Task /></PrivateRoute>} />
 
             {/* Catch-all */}

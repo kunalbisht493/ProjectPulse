@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const {signup,login} = require('../Controllers/AuthController');
-const {createProject, getProjects, getProjectById, updateProject, deleteProject} = require('../Controllers/ProjectController');
+const {createProject, getProjects, getProjectById, updateProject, deleteProject, softDeleteProject, getTrashedProjects, restoreProject} = require('../Controllers/ProjectController');
 const {createTask, deleteTask} = require('../Controllers/TaskController');
 const {createComment, deleteComment} = require('../Controllers/CommentController'); 
 const {auth} = require('../Middlewares/Auth');
@@ -15,6 +15,9 @@ router.post('/login', login);
 router.post('/project/createproject', createProject);
 router.get('/project/getprojects',auth, getProjects);
 router.get('/project/getproject/:id', getProjectById);
+router.put('/project/:id/softdelete',softDeleteProject);
+router.get('/project/getTrashedProject',auth,getTrashedProjects)
+router.put('/project/:id/restoreProject',auth,restoreProject)
 router.put('/project/updateproject/:id', updateProject);
 router.put('/project/deleteproject/:id', deleteProject);
 
