@@ -1,13 +1,15 @@
+
 import { useState, useEffect, useContext } from "react";
 import { showError, showSuccess } from "../Utils/Toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../Context/AppContext";
 
-function CreateProject({ onClose }){
-    const {projectData ,setProjectData}=useContext(AppContext)
+function CreateProject({ onClose }) {
+    const { projectData, setProjectData } = useContext(AppContext)
     const navigate = useNavigate();
-    //FOR POPU ANIMATION
+
+    //FOR POPUP ANIMATION
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -20,7 +22,7 @@ function CreateProject({ onClose }){
         // Wait for animation to complete before calling onClose
         setTimeout(() => {
             onClose();
-        }, 1000);
+        }, 300); // Reduced timeout to match animation duration
     };
 
     // SENDING RESPONSE TO BACKEND
@@ -51,14 +53,18 @@ function CreateProject({ onClose }){
     };
 
     return (
-        <div className={`fixed inset-0  transition-opacity duration-200 ease-out flex items-center justify-center z-50 p-4 ${isVisible ? 'bg-opacity-50' : 'bg-opacity-0'
+        <div className={`fixed inset-0 transition-all duration-300 ease-out flex items-center justify-center z-50 p-4 ${isVisible
+                ? 'bg-black/50 backdrop-blur-sm'
+                : 'bg-black/0 backdrop-blur-none'
             }`}>
-            <div className={`bg-white p-6 rounded-xl shadow-xl max-w-4xl w-full mx-auto relative transition-all duration-200 ease-out ${isVisible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'
+            <div className={`bg-white/95 backdrop-blur-md p-6 rounded-xl shadow-2xl border border-white/20 max-w-4xl w-full mx-auto relative transition-all duration-300 ease-out ${isVisible
+                    ? 'opacity-100 scale-100 translate-y-0'
+                    : 'opacity-0 scale-95 translate-y-4'
                 }`}>
 
                 <div className="text-center mb-6">
                     <h1 className="text-2xl font-bold text-gray-800 mb-2">Create New Project</h1>
-                    <p className="text-gray-500 text-sm">Fill in the details below to start your project</p>
+                    <p className="text-gray-600 text-sm">Fill in the details below to start your project</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
@@ -73,7 +79,7 @@ function CreateProject({ onClose }){
                             placeholder="Enter project name"
                             type="text"
                             required
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
+                            className="w-full p-3 border border-gray-300/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm hover:bg-white/70"
                         />
                     </div>
 
@@ -88,7 +94,7 @@ function CreateProject({ onClose }){
                             placeholder="Enter manager name"
                             type="text"
                             required
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
+                            className="w-full p-3 border border-gray-300/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm hover:bg-white/70"
                         />
                     </div>
 
@@ -102,7 +108,7 @@ function CreateProject({ onClose }){
                             onChange={handleInputChange}
                             placeholder="Brief description of your project"
                             rows="2"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white resize-none"
+                            className="w-full p-3 border border-gray-300/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm hover:bg-white/70 resize-none"
                         />
                     </div>
 
@@ -116,19 +122,21 @@ function CreateProject({ onClose }){
                             onChange={handleInputChange}
                             type="date"
                             required
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
+                            className="w-full p-3 border border-gray-300/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm hover:bg-white/70"
                         />
                     </div>
 
                     <div className="col-span-2 flex space-x-4 pt-4">
                         <button
+                            type="submit"
                             className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-200"
                         >
                             Create Project
                         </button>
                         <button
+                            type="button"
                             onClick={handleClose}
-                            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-200"
+                            className="flex-1 bg-gray-200/80 backdrop-blur-sm hover:bg-gray-300/80 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 active:scale-95 transition-all duration-200 border border-gray-300/50"
                         >
                             Cancel
                         </button>

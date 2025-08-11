@@ -22,13 +22,26 @@ export function AppContextProvider({ children }) {
     });
 
     // FOR PROJECT DETAILS
-    const [projectDetails , setProjectDetails]=useState([])
+    const [projectDetails, setProjectDetails] = useState([])
 
     // TRASH
-    const [trashProject,setTrashProject]=useState([])
+    const [trashProject, setTrashProject] = useState([])
 
     // FOR CREATING PROJECT
     const [showModal, setShowModal] = useState(false);
+
+    const [currentProject, setCurrentProject] = useState(null);
+    const [createTasks, setCreateTasks] = useState({
+        description:'',
+        dueDate:'',
+        assignedTo:'',
+        priority:''
+
+    });
+    const [showCreateTask, setShowCreateTask] = useState(false);
+    const [taskColumn, setTaskColumn] = useState('');
+
+
     const values = {
         userData,
         setUserData,
@@ -41,7 +54,15 @@ export function AppContextProvider({ children }) {
         showModal,
         setShowModal,
         trashProject,
-        setTrashProject
+        setTrashProject,
+        currentProject,
+        setCurrentProject,
+        showCreateTask,
+        setShowCreateTask,
+        taskColumn,
+        setTaskColumn,
+        createTasks,
+        setCreateTasks
     }
 
     return <AppContext.Provider value={values}>{children}</AppContext.Provider>

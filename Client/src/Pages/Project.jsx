@@ -1,3 +1,4 @@
+
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../Context/AppContext";
 import { Trash, Edit } from "lucide-react";
@@ -7,7 +8,7 @@ import axios from "axios";
 import { NavLink } from "react-router-dom";
 
 function Project() {
-    const { projectDetails, setProjectDetails, showModal, setShowModal} = useContext(AppContext);
+    const { projectDetails, setProjectDetails, showModal, setShowModal } = useContext(AppContext);
     const [editingProject, setEditingProject] = useState(null);
     const token = localStorage.getItem("token")
 
@@ -62,7 +63,7 @@ function Project() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 relative overflow-hidden">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 relative overflow-hidden pt-20">
             {/* Subtle Background Elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-100/20 to-indigo-100/20 rounded-full blur-3xl"></div>
@@ -112,8 +113,8 @@ function Project() {
                                 key={project._id}
                                 className="group bg-white/70 backdrop-blur-sm shadow-sm hover:shadow-md rounded-lg border border-gray-200/50 hover:border-blue-200/50 transition-all duration-300 hover:bg-white/90 transform hover:-translate-y-0.5"
                             >
-                                <NavLink to="/task" className="flex items-center justify-between p-4">
-                                    <div  className="flex-1 text-center">
+                                <NavLink to={`/task/${project._id}`} className="flex items-center justify-between p-4">
+                                    <div className="flex-1 text-center">
                                         <div className="font-medium text-gray-800 group-hover:text-blue-600 transition-colors duration-200 hover:underline">
                                             {project.name}
                                         </div>
@@ -163,8 +164,8 @@ function Project() {
 
             {/* Modal */}
             {showModal && (
-                <CreateProject 
-                    onClose={handleCloseModal} 
+                <CreateProject
+                    onClose={handleCloseModal}
                     editingProject={editingProject}
                 />
             )}

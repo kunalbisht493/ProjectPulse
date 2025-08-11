@@ -27,24 +27,38 @@ function TrashProject() {
     // FOR RECOVERY
     const handleRecover = async (projectId) => {
         try {
-            const res = await axios.put(`http://localhost:4000/api/v1/project/${projectId}/restoreProject`,{}, {
+            const res = await axios.put(`http://localhost:4000/api/v1/project/${projectId}/restoreProject`, {}, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
-            setTrashProject(prevTrash=>prevTrash.filter(trash=>trash._id !==projectId))
-            setProjectDetails(prev=>[...prev,res.data.project])
+            setTrashProject(prevTrash => prevTrash.filter(trash => trash._id !== projectId))
+            setProjectDetails(prev => [...prev, res.data.project])
             showSuccess(res.data.message)
 
         } catch (err) {
-             showError(err.response?.data?.message || 'unable to restore');
+            showError(err.response?.data?.message || 'unable to restore');
 
         }
     };
 
     // FOR PERMANENT DELETE
-    const handlePermanentDelete = (projectId) => {
-        // Add your permanent delete logic here
+    const handlePermanentDelete = async (projectId) => {
+        window.confirm("Do you want to delete")
+        try {
+            const res = await axios.put(`http://localhost:4000/api/v1/project/trash/deleteproject/${projectId}`, {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            setTrashProject(prevTrash => prevTrash.filter(trash => trash._id !== projectId))
+            showSuccess(res.data.message)
+
+
+        } catch (err) {
+            showError(err.response?.data?.message || 'unable to delete');
+        }
+
         console.log('Permanently delete project:', projectId);
     };
 

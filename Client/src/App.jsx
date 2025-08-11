@@ -46,7 +46,7 @@ function App() {
             <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
             <Route path="/project" element={<PrivateRoute><Project /></PrivateRoute>} />
             <Route path="/trash" element={<PrivateRoute><TrashProject /></PrivateRoute>} />
-            <Route path="/task" element={<PrivateRoute><Task /></PrivateRoute>} />
+            <Route path="/task/:projectId" element={<PrivateRoute><Task /></PrivateRoute>} />
 
             {/* Catch-all */}
            <Route path="*" element={<Navigate to={isLoggedIn ? location.pathname : "/auth"} />} />

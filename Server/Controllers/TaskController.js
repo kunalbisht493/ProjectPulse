@@ -6,10 +6,11 @@ const User = require('../Models/UserSchema');
 exports.createTask = async (req, res) => {
     try {
         // FETCHING DATA FROM THE REQUEST BODY
-        const { description, dueDate, assignedTo, project, priority } = req.body;
+        const { description, dueDate, assignedTo,priority } = req.body;
+        const projectId = req.params.id;
 
         // FETCHING USER FROM THE DATABASE
-        const user = await User.findOne({name:assignedTo});
+        const user = await User.findOne({ name: assignedTo });
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -17,7 +18,7 @@ exports.createTask = async (req, res) => {
             })
         }
         // FETCHING PROJECT FROM THE DATABASE
-        const projectData = await Project.findOne({title: project});
+        const projectData = await Project.findById( projectId );
         if (!projectData) {
             return res.status(404).json({
                 success: false,
@@ -37,12 +38,12 @@ exports.createTask = async (req, res) => {
             dueDate,
             assignedTo: user._id,
             priority: priority || 'medium',
-            project: projectData._id
+            project: projectData
         })
 
         // ADDING THE TASK TO THE PROJECT TASKS ARRAY
         await Project.findByIdAndUpdate(
-            projectData, { $addToSet: { task: newTask._id , teamMembers:newTask.assignedTo } }, { new: true }).populate('task').exec();
+            projectData, { $addToSet: { task: newTask._id, teamMembers: newTask.assignedTo } }, { new: true }).populate('task').exec();
 
         // SENDING SUCCESS RESPONSE
         return res.status(200).json({
@@ -60,6 +61,42 @@ exports.createTask = async (req, res) => {
         });
     }
 }
+
+
+// GET ALL TASKS FOR A SPECIFIC PROJECT
+exports.getTasksByProject = async (req, res) => {
+    try {
+        const  projectId  = req.params.id;
+
+        // Check if project exists
+        const project = await Project.findById(projectId);
+        if (!project) {
+            return res.status(404).json({
+                success: false,
+                message: "Project not found",
+            });
+        }
+
+        // Find all tasks for the given project
+        const tasks = await Task.find({ project: projectId })
+            .populate('assignedTo', 'name email') // Populate assigned user details
+            .populate('project', 'title');        // Populate project title if needed
+
+        return res.status(200).json({
+            success: true,
+            message: "Tasks fetched successfully",
+            tasks,
+        });
+    } catch (error) {
+        console.error("Error in getTasksByProject:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message,
+        });
+    }
+};
+
 
 // UPDATE PRIORITY OF A TASK
 exports.updateTaskPriority = async (req, res) => {
