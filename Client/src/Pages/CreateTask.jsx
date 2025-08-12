@@ -4,12 +4,12 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { showSuccess, showError } from "../Utils/Toast";
 function CreateTask() {
-    const { taskColumn, createTasks, setCreateTasks, setShowCreateTask } = useContext(AppContext)
-      const { projectId } = useParams()
+    const { taskColumn, createTasks, setCreateTasks,setTaskChanged, setShowCreateTask } = useContext(AppContext)
+    const { projectId } = useParams()
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-      
+
         const { description, dueDate, assignedTo, priority } = createTasks;
         const payload = {
             description,
@@ -24,7 +24,9 @@ function CreateTask() {
                     "Content-Type": "application/json"
                 }
             })
-            setCreateTasks({description:"", dueDate:"",assignedTo:"",priority:""});
+
+            setCreateTasks({ description: "", dueDate: "", assignedTo: "", priority: "" });
+            setTaskChanged(prev => !prev);
             setShowCreateTask(false)
             showSuccess(res.data.message)
 
@@ -89,28 +91,30 @@ function CreateTask() {
                     name="assignedTo"
                     value={createTasks.assignedTo}
                     onChange={handleChange}
-                    placeholder="Enter task"
+                    placeholder="Enter a name"
                     type="text"
                     required
                     className="w-full p-3 border border-gray-300/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm hover:bg-white/70"
                 >
                 </input>
-                <div className="flex gap-3 justify-end mt-4">
-                    <button
-                        type="button"
-                        onClick={handleCancel}
-                        className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-                    >
-                        Create Task
-                    </button>
-                </div>
+ 
             </form>
+            <div className="flex gap-3 justify-end mt-4">
+                <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="px-4 py-2  text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="submit"
+                    onClick={handleSubmit}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                    Create Task
+                </button>
+            </div>
         </div>
     </div>)
 

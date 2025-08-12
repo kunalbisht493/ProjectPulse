@@ -63,7 +63,7 @@ function TrashProject() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-red-50/30 to-orange-50/30 relative overflow-hidden">
+        <div className="min-h-screen pt-20 bg-gradient-to-br from-gray-50 via-red-50/30 to-orange-50/30 relative overflow-hidden">
             {/* Subtle Background Elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-red-100/20 to-orange-100/20 rounded-full blur-3xl"></div>

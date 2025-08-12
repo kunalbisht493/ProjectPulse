@@ -135,12 +135,12 @@ exports.updateTaskPriority = async (req, res) => {
 exports.updateTaskStatus = async (req, res) => {
     try {
         // FETCHING TASK ID AND NEW STATUS FROM THE REQUEST BODY
-        const { id } = req.params;
+        const taskId = req.params.id;
         const { status } = req.body;
 
         // UPDATING THE TASK STATUS AND SAVING IT TO THE DATABASE
         const updatedTask = await Task.findByIdAndUpdate(
-            id,
+            taskId,
             { status },
             { new: true })
 

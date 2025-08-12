@@ -38,6 +38,9 @@ export function AppContextProvider({ children }) {
         priority:''
 
     });
+
+    const [taskChanged, setTaskChanged] = useState(false);
+
     const [showCreateTask, setShowCreateTask] = useState(false);
     const [taskColumn, setTaskColumn] = useState('');
 
@@ -62,7 +65,10 @@ export function AppContextProvider({ children }) {
         taskColumn,
         setTaskColumn,
         createTasks,
-        setCreateTasks
+        setCreateTasks,
+        taskChanged,
+        setTaskChanged,
+
     }
 
     return <AppContext.Provider value={values}>{children}</AppContext.Provider>

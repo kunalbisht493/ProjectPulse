@@ -3,7 +3,7 @@ const router = express.Router();
 
 const {signup,login} = require('../Controllers/AuthController');
 const {createProject, getProjects, getProjectById, updateProject, deleteProject, softDeleteProject, getTrashedProjects, restoreProject} = require('../Controllers/ProjectController');
-const {createTask, deleteTask , getTasksByProject} = require('../Controllers/TaskController');
+const {createTask, deleteTask , getTasksByProject, updateTaskStatus} = require('../Controllers/TaskController');
 const {createComment, deleteComment} = require('../Controllers/CommentController'); 
 const {auth} = require('../Middlewares/Auth');
 
@@ -24,6 +24,7 @@ router.put('/project/trash/deleteproject/:id', deleteProject);
 // TASK ROUTES
 router.post('/project/:id/createtask', createTask);
 router.get('/project/task/:id',auth,getTasksByProject)
+router.put('/project/taskupdate/:id', updateTaskStatus);
 router.put('/task/deletetask/:id', deleteTask);
 
 
